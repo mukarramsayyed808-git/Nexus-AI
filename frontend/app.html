@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nexus AI V6</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="toast"></div>
+<div id="app-layout">
+
+<!-- ══ SIDEBAR ══ -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo" onclick="showPanel('dashboard')">
+      <div class="logo-icon">⬡</div>
+      <div>
+        <div class="logo-name" style="display:flex;align-items:center">Nexus AI<span class="logo-ver">V6</span></div>
+        <div class="logo-sub">Multi-AI Super App</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Model Toggles -->
+  <div class="sidebar-section">
+    <div class="section-label">AI Models</div>
+    <div class="model-toggle active" id="mt-claude">
+      <div class="model-dot claude"></div>
+      <div><div class="model-name">Claude</div><div class="model-sub-text">Anthropic Sonnet</div></div>
+      <button class="tog-switch on" id="tog-claude" onclick="toggleModel('claude')"></button>
+    </div>
+    <div class="model-toggle active" id="mt-openai">
+      <div class="model-dot openai"></div>
+      <div><div class="model-name">ChatGPT</div><div class="model-sub-text">GPT-4o Mini</div></div>
+      <button class="tog-switch on" id="tog-openai" onclick="toggleModel('openai')"></button>
+    </div>
+    <div class="model-toggle active" id="mt-gemini">
+      <div class="model-dot gemini"></div>
+      <div><div class="model-name">Gemini</div><div class="model-sub-text">1.5 Flash</div></div>
+      <button class="tog-switch on" id="tog-gemini" onclick="toggleModel('gemini')"></button>
+    </div>
+    <div class="model-toggle active" id="mt-deepseek">
+      <div class="model-dot deepseek"></div>
+      <div><div class="model-name">DeepSeek</div><div class="model-sub-text">DeepSeek V3</div></div>
+      <button class="tog-switch on" id="tog-deepseek" onclick="toggleModel('deepseek')"></button>
+    </div>
+  </div>
+
+  <div class="s-divider"></div>
+
+  <!-- Nav -->
+  <div class="sidebar-section">
+    <div class="section-label">Overview</div>
+    <button class="nav-item active" id="nav-dashboard" onclick="showPanel('dashboard')"><span class="nav-icon">⊞</span>Dashboard</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="section-label">AI Tools</div>
+    <button class="nav-item" id="nav-chat"      onclick="showPanel('chat')"><span class="nav-icon">💬</span>AI Chat<span class="nav-badge">4 Models</span></button>
+    <button class="nav-item" id="nav-image"     onclick="showPanel('image')"><span class="nav-icon">🎨</span>Image Gen</button>
+    <button class="nav-item" id="nav-code"      onclick="showPanel('code')"><span class="nav-icon">💻</span>Code Assistant</button>
+    <button class="nav-item" id="nav-music"     onclick="showPanel('music')"><span class="nav-icon">🎵</span>Music Studio</button>
+    <button class="nav-item" id="nav-voice"     onclick="showPanel('voice')"><span class="nav-icon">🎙️</span>Voice Lab</button>
+    <button class="nav-item" id="nav-video"     onclick="showPanel('video')"><span class="nav-icon">🎬</span>Video Director</button>
+  </div>
+  <div class="sidebar-section">
+    <div class="section-label">New in V6</div>
+    <button class="nav-item" id="nav-translate" onclick="showPanel('translate')"><span class="nav-icon">🌐</span>Translate<span class="nav-new">New</span></button>
+    <button class="nav-item" id="nav-pdf"       onclick="showPanel('pdf')"><span class="nav-icon">📄</span>PDF Analyzer<span class="nav-new">New</span></button>
+    <button class="nav-item" id="nav-seo"       onclick="showPanel('seo')"><span class="nav-icon">📈</span>SEO Writer<span class="nav-new">New</span></button>
+    <button class="nav-item" id="nav-resume"    onclick="showPanel('resume')"><span class="nav-icon">📋</span>Resume Builder<span class="nav-new">New</span></button>
+    <button class="nav-item" id="nav-agents"    onclick="showPanel('agents')"><span class="nav-icon">🤖</span>AI Agents<span class="nav-new">New</span></button>
+  </div>
+  <div class="sidebar-section">
+    <div class="section-label">Account</div>
+    <button class="nav-item" id="nav-history"  onclick="showPanel('history')"><span class="nav-icon">🕐</span>History</button>
+    <button class="nav-item" id="nav-profile"  onclick="showPanel('profile')"><span class="nav-icon">👤</span>Profile</button>
+    <button class="nav-item" id="nav-settings" onclick="showPanel('settings')"><span class="nav-icon">⚙️</span>Settings</button>
+    <button class="nav-item" id="nav-admin" style="display:none" onclick="window.location.href='admin.html'">
+      <span class="nav-icon">🛡️</span>Admin Panel
+      <span class="admin-badge badge-admin" style="margin-left:auto">Admin</span>
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <div style="overflow:hidden">
+        <div class="user-name"  id="user-name">User</div>
+        <div class="user-email" id="user-email">user@nexusai.app</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ MAIN AREA ══ -->
+<div id="main-area">
+  <div id="topbar">
+    <span class="topbar-title" id="topbar-title">Dashboard</span>
+    <span class="logo-ver" style="font-size:10px">V6</span>
+    <div class="topbar-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="lb-en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn"        id="lb-hi" onclick="setLang('hi')">हि</button>
+      </div>
+      <span id="admin-badge" style="display:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(168,85,247,0.12);color:var(--deepseek)">⬡ Admin</span>
+      <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="welcome-banner">
+        <div class="v6-pill">✦ VERSION 6 · 4 AI MODELS</div>
+        <h2>Welcome back, <span id="welcome-name">User</span> 👋</h2>
+        <p id="welcome-p">14 AI tools · Claude · ChatGPT · Gemini · DeepSeek — all responding simultaneously</p>
+      </div>
+      <div class="stats-4" id="dash-admin-stats" style="display:none">
+        <div class="stat-card c1"><div class="stat-label">AI Models</div><div class="stat-val">4</div><div class="stat-sub">All active</div></div>
+        <div class="stat-card c2"><div class="stat-label">Total Tools</div><div class="stat-val">14</div><div class="stat-sub">5 new in V6</div></div>
+        <div class="stat-card c3"><div class="stat-label">Status</div><div class="stat-val" style="font-size:14px;color:var(--success)">Online</div><div class="stat-sub">All systems go</div></div>
+        <div class="stat-card c4"><div class="stat-label">Version</div><div class="stat-val" style="font-size:14px;color:var(--deepseek)">6.0.0</div><div class="stat-sub">Latest</div></div>
+      </div>
+      <div class="tools-3">
+        <div class="tool-card" onclick="showPanel('chat')"><div class="tool-card-icon">💬</div><div class="tool-card-name">AI Chat</div><div class="tool-card-desc">4 models respond simultaneously</div></div>
+        <div class="tool-card" onclick="showPanel('image')"><div class="tool-card-icon">🎨</div><div class="tool-card-name">Image Gen</div><div class="tool-card-desc">AI image concepts and prompts</div></div>
+        <div class="tool-card" onclick="showPanel('code')"><div class="tool-card-icon">💻</div><div class="tool-card-name">Code Assistant</div><div class="tool-card-desc">Write, debug and explain code</div></div>
+        <div class="tool-card" onclick="showPanel('music')"><div class="tool-card-icon">🎵</div><div class="tool-card-name">Music Studio</div><div class="tool-card-desc">Songs, lyrics and chords</div></div>
+        <div class="tool-card" onclick="showPanel('voice')"><div class="tool-card-icon">🎙️</div><div class="tool-card-name">Voice Lab</div><div class="tool-card-desc">Voice scripts and podcast copy</div></div>
+        <div class="tool-card" onclick="showPanel('video')"><div class="tool-card-icon">🎬</div><div class="tool-card-name">Video Director</div><div class="tool-card-desc">Scripts, shot lists, storyboards</div></div>
+        <div class="tool-card new-tool" onclick="showPanel('translate')"><div class="tool-card-icon">🌐</div><div class="tool-card-name">Translate<span class="tc-new-badge">New</span></div><div class="tool-card-desc">AI translation 12+ languages</div></div>
+        <div class="tool-card new-tool" onclick="showPanel('pdf')"><div class="tool-card-icon">📄</div><div class="tool-card-name">PDF Analyzer<span class="tc-new-badge">New</span></div><div class="tool-card-desc">Summarize and extract from PDFs</div></div>
+        <div class="tool-card new-tool" onclick="showPanel('seo')"><div class="tool-card-icon">📈</div><div class="tool-card-name">SEO Writer<span class="tc-new-badge">New</span></div><div class="tool-card-desc">SEO-optimized content</div></div>
+        <div class="tool-card new-tool" onclick="showPanel('resume')"><div class="tool-card-icon">📋</div><div class="tool-card-name">Resume Builder<span class="tc-new-badge">New</span></div><div class="tool-card-desc">AI-crafted professional resumes</div></div>
+        <div class="tool-card new-tool" onclick="showPanel('agents')"><div class="tool-card-icon">🤖</div><div class="tool-card-name">AI Agents<span class="tc-new-badge">New</span></div><div class="tool-card-desc">6 autonomous AI task agents</div></div>
+        <div class="tool-card" onclick="showPanel('history')"><div class="tool-card-icon">🕐</div><div class="tool-card-name">History</div><div class="tool-card-desc">All interactions from MongoDB</div></div>
+      </div>
+    </div>
+
+    <!-- ══ MULTI-MODEL CHAT ══ -->
+    <div class="chat-panel" id="panel-chat">
+      <div class="model-header-bar" id="model-chips-bar"></div>
+      <div class="chat-columns cols-4" id="chat-cols"></div>
+      <div class="chat-input-area">
+        <div class="input-container">
+          <textarea id="chat-input" rows="1" placeholder="Ask all 4 AI models simultaneously… / सभी AI से एक साथ पूछें…" onkeydown="chatKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="input-actions">
+            <span class="active-models-count" id="active-count">4 models</span>
+            <button class="send-btn" id="chat-send" onclick="sendToAll()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ IMAGE ══ -->
+    <div class="panel" id="panel-image">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Describe your image</div><div class="section-sub">Be as detailed as possible</div></div>
+          <textarea class="tool-textarea" id="image-input" rows="6" placeholder="e.g. A futuristic city at sunset with neon lights and flying cars…"></textarea>
+          <div><div class="section-title" style="margin-bottom:6px">Style</div>
+          <div class="chip-row" id="image-chips">
+            <button class="chip on" onclick="chipSel(this,'image-chips')">Photorealistic</button>
+            <button class="chip" onclick="chipSel(this,'image-chips')">Digital Art</button>
+            <button class="chip" onclick="chipSel(this,'image-chips')">Anime</button>
+            <button class="chip" onclick="chipSel(this,'image-chips')">Oil Painting</button>
+            <button class="chip" onclick="chipSel(this,'image-chips')">Pixel Art</button>
+          </div></div>
+          <button class="btn-run" id="image-btn" onclick="runTool('image')">✦ Generate Concept</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">AI Output</div><div class="output-box" id="image-output"><div class="output-placeholder">🎨 Your image concept will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ CODE ══ -->
+    <div class="panel" id="panel-code">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">What do you need?</div><div class="section-sub">Write, debug or explain code</div></div>
+          <textarea class="tool-textarea" id="code-input" rows="6" placeholder="e.g. Write a REST API in FastAPI with JWT authentication…"></textarea>
+          <div><div class="section-title" style="margin-bottom:6px">Language</div>
+          <div class="chip-row" id="code-chips">
+            <button class="chip on" onclick="chipSel(this,'code-chips')">Python</button>
+            <button class="chip" onclick="chipSel(this,'code-chips')">JavaScript</button>
+            <button class="chip" onclick="chipSel(this,'code-chips')">TypeScript</button>
+            <button class="chip" onclick="chipSel(this,'code-chips')">Go</button>
+            <button class="chip" onclick="chipSel(this,'code-chips')">Rust</button>
+            <button class="chip" onclick="chipSel(this,'code-chips')">SQL</button>
+          </div></div>
+          <button class="btn-run" id="code-btn" onclick="runTool('code')">✦ Run AI</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">AI Output</div><div class="output-box" id="code-output"><div class="output-placeholder">💻 Your code will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ MUSIC ══ -->
+    <div class="panel" id="panel-music">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Describe your track</div><div class="section-sub">Mood, theme, inspiration</div></div>
+          <textarea class="tool-textarea" id="music-input" rows="6" placeholder="e.g. A melancholic lo-fi track for a late night study session…"></textarea>
+          <div><div class="section-title" style="margin-bottom:6px">Genre</div>
+          <div class="chip-row" id="music-chips">
+            <button class="chip on" onclick="chipSel(this,'music-chips')">Lo-Fi</button>
+            <button class="chip" onclick="chipSel(this,'music-chips')">EDM</button>
+            <button class="chip" onclick="chipSel(this,'music-chips')">Hip Hop</button>
+            <button class="chip" onclick="chipSel(this,'music-chips')">Ambient</button>
+            <button class="chip" onclick="chipSel(this,'music-chips')">Jazz</button>
+          </div></div>
+          <button class="btn-run" id="music-btn" onclick="runTool('music')">✦ Create Track</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">AI Output</div><div class="output-box" id="music-output"><div class="output-placeholder">🎵 Your song concept will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ VOICE ══ -->
+    <div class="panel" id="panel-voice">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Describe your voice content</div><div class="section-sub">Script type, tone, length</div></div>
+          <textarea class="tool-textarea" id="voice-input" rows="6" placeholder="e.g. A 60-second energetic podcast intro for a tech show…"></textarea>
+          <div><div class="section-title" style="margin-bottom:6px">Type</div>
+          <div class="chip-row" id="voice-chips">
+            <button class="chip on" onclick="chipSel(this,'voice-chips')">Podcast Intro</button>
+            <button class="chip" onclick="chipSel(this,'voice-chips')">Ad Voice-over</button>
+            <button class="chip" onclick="chipSel(this,'voice-chips')">Audiobook</button>
+            <button class="chip" onclick="chipSel(this,'voice-chips')">Explainer</button>
+          </div></div>
+          <button class="btn-run" id="voice-btn" onclick="runTool('voice')">✦ Generate Script</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">AI Output</div><div class="output-box" id="voice-output"><div class="output-placeholder">🎙️ Your voice script will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ VIDEO ══ -->
+    <div class="panel" id="panel-video">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Describe your video</div><div class="section-sub">Format, topic, style</div></div>
+          <textarea class="tool-textarea" id="video-input" rows="6" placeholder="e.g. A 3-minute YouTube video introducing a new AI product…"></textarea>
+          <div><div class="section-title" style="margin-bottom:6px">Format</div>
+          <div class="chip-row" id="video-chips">
+            <button class="chip on" onclick="chipSel(this,'video-chips')">YouTube</button>
+            <button class="chip" onclick="chipSel(this,'video-chips')">Short Film</button>
+            <button class="chip" onclick="chipSel(this,'video-chips')">Ad Campaign</button>
+            <button class="chip" onclick="chipSel(this,'video-chips')">Documentary</button>
+          </div></div>
+          <button class="btn-run" id="video-btn" onclick="runTool('video')">✦ Direct Video</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">AI Output</div><div class="output-box" id="video-output"><div class="output-placeholder">🎬 Your video script will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ TRANSLATE ══ -->
+    <div class="panel" id="panel-translate">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Text to translate</div><div class="section-sub">Paste or type your content</div></div>
+          <div class="lang-row">
+            <select class="lang-sel" id="lang-from"><option>Auto Detect</option><option>English</option><option>Hindi</option><option>Spanish</option><option>French</option><option>German</option><option>Japanese</option><option>Chinese</option><option>Arabic</option></select>
+            <button class="swap-btn" onclick="swapLangs()">⇄</button>
+            <select class="lang-sel" id="lang-to"><option>Hindi</option><option>English</option><option>Spanish</option><option>French</option><option>German</option><option>Japanese</option><option>Chinese</option><option>Arabic</option></select>
+          </div>
+          <textarea class="tool-textarea" id="translate-input" rows="6" placeholder="Enter text to translate…"></textarea>
+          <div class="chip-row" id="translate-chips">
+            <button class="chip on" onclick="chipSel(this,'translate-chips')">Formal</button>
+            <button class="chip" onclick="chipSel(this,'translate-chips')">Casual</button>
+            <button class="chip" onclick="chipSel(this,'translate-chips')">Business</button>
+          </div>
+          <button class="btn-run purple" id="translate-btn" onclick="runTool('translate')">🌐 Translate</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">Translation</div><div class="output-box" id="translate-output"><div class="output-placeholder">🌐 Translation will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ PDF ══ -->
+    <div class="panel" id="panel-pdf">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">PDF Analyzer</div><div class="section-sub">Paste PDF text content</div></div>
+          <textarea class="tool-textarea" id="pdf-input" rows="8" placeholder="Paste your PDF text content here…"></textarea>
+          <div class="chip-row" id="pdf-chips">
+            <button class="chip on" onclick="chipSel(this,'pdf-chips')">Summarize</button>
+            <button class="chip" onclick="chipSel(this,'pdf-chips')">Key Points</button>
+            <button class="chip" onclick="chipSel(this,'pdf-chips')">Q&A</button>
+            <button class="chip" onclick="chipSel(this,'pdf-chips')">Extract Data</button>
+          </div>
+          <button class="btn-run purple" id="pdf-btn" onclick="runTool('pdf')">📄 Analyze</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">Analysis Output</div><div class="output-box" id="pdf-output"><div class="output-placeholder">📄 Analysis will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ SEO ══ -->
+    <div class="panel" id="panel-seo">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">SEO Content Writer</div><div class="section-sub">Topic, keywords, audience</div></div>
+          <textarea class="tool-textarea" id="seo-input" rows="6" placeholder="Topic: Best AI tools. Keywords: AI, productivity. Audience: developers…"></textarea>
+          <div class="chip-row" id="seo-chips">
+            <button class="chip on" onclick="chipSel(this,'seo-chips')">Blog Post</button>
+            <button class="chip" onclick="chipSel(this,'seo-chips')">Meta Tags</button>
+            <button class="chip" onclick="chipSel(this,'seo-chips')">Landing Page</button>
+            <button class="chip" onclick="chipSel(this,'seo-chips')">Social Post</button>
+          </div>
+          <button class="btn-run purple" id="seo-btn" onclick="runTool('seo')">📈 Generate SEO</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">SEO Output</div><div class="output-box" id="seo-output"><div class="output-placeholder">📈 SEO content will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ RESUME ══ -->
+    <div class="panel" id="panel-resume">
+      <div class="tool-layout">
+        <div class="tool-input-section">
+          <div><div class="section-title">Resume Builder</div><div class="section-sub">Experience and target role</div></div>
+          <textarea class="tool-textarea" id="resume-input" rows="8" placeholder="Name: John. Role: Python Dev. 5 years exp. Skills: FastAPI, MongoDB. Applying for: Lead Engineer…"></textarea>
+          <div class="chip-row" id="resume-chips">
+            <button class="chip on" onclick="chipSel(this,'resume-chips')">Full Resume</button>
+            <button class="chip" onclick="chipSel(this,'resume-chips')">Cover Letter</button>
+            <button class="chip" onclick="chipSel(this,'resume-chips')">LinkedIn Bio</button>
+            <button class="chip" onclick="chipSel(this,'resume-chips')">Summary</button>
+          </div>
+          <button class="btn-run purple" id="resume-btn" onclick="runTool('resume')">📋 Build Resume</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">Resume Output</div><div class="output-box" id="resume-output"><div class="output-placeholder">📋 Resume will appear here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ AGENTS ══ -->
+    <div class="panel" id="panel-agents">
+      <div style="flex-shrink:0"><div style="font-size:15px;font-weight:600;color:var(--text)">AI Agents</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Select an agent, describe your task, let AI work autonomously</div></div>
+      <div class="agents-grid">
+        <div class="agent-card" id="ag-researcher" onclick="selectAgent('researcher','Research Agent')"><div class="agent-ic">🔍</div><div class="agent-nm">Research Agent</div><div class="agent-ds">Deep research and structured reports.</div><span class="agent-status s-ready">Ready</span></div>
+        <div class="agent-card" id="ag-writer"     onclick="selectAgent('writer','Content Writer')"><div class="agent-ic">✍️</div><div class="agent-nm">Content Writer</div><div class="agent-ds">Long-form content automatically.</div><span class="agent-status s-ready">Ready</span></div>
+        <div class="agent-card" id="ag-analyst"    onclick="selectAgent('analyst','Data Analyst')"><div class="agent-ic">📊</div><div class="agent-nm">Data Analyst</div><div class="agent-ds">Patterns, insights, recommendations.</div><span class="agent-status s-ready">Ready</span></div>
+        <div class="agent-card" id="ag-debugger"   onclick="selectAgent('debugger','Debug Agent')"><div class="agent-ic">🐛</div><div class="agent-nm">Debug Agent</div><div class="agent-ds">Find bugs and provide fixes.</div><span class="agent-status s-ready">Ready</span></div>
+        <div class="agent-card" id="ag-marketer"   onclick="selectAgent('marketer','Marketing Agent')"><div class="agent-ic">📣</div><div class="agent-nm">Marketing Agent</div><div class="agent-ds">Full campaigns: ads, emails, posts.</div><span class="agent-status s-beta">Beta</span></div>
+        <div class="agent-card" id="ag-planner"    onclick="selectAgent('planner','Project Planner')"><div class="agent-ic">🗓️</div><div class="agent-nm">Project Planner</div><div class="agent-ds">Tasks, timelines, milestones.</div><span class="agent-status s-beta">Beta</span></div>
+      </div>
+      <div class="tool-layout" style="margin-top:4px">
+        <div class="tool-input-section">
+          <div class="section-title" id="agent-selected-title">Select an agent above ↑</div>
+          <textarea class="tool-textarea" id="agent-input" rows="4" placeholder="Describe your task for the agent…"></textarea>
+          <button class="btn-run" id="agent-btn" onclick="runAgent()" disabled style="background:linear-gradient(135deg,#d97706,#f59e0b)">🤖 Run Agent</button>
+        </div>
+        <div class="tool-output-section"><div class="section-title">Agent Output</div><div class="output-box" id="agent-output"><div class="output-placeholder">🤖 Select an agent and describe your task.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ HISTORY ══ -->
+    <div class="panel" id="panel-history">
+      <div class="history-header">
+        <div><div class="history-heading">History</div><div class="history-sub">All AI interactions saved to MongoDB</div></div>
+        <button class="btn-run danger" style="padding:7px 14px;font-size:12px" onclick="clearHistory()">🗑 Clear All</button>
+      </div>
+      <div class="history-list" id="history-list"><div class="output-placeholder">Loading history…</div></div>
+    </div>
+
+    <!-- ══ PROFILE ══ -->
+    <div class="panel" id="panel-profile">
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="prof-av" id="prof-av">U</div>
+          <div class="prof-name" id="prof-name">User</div>
+          <div class="prof-email-d" id="prof-email-disp">user@nexusai.app</div>
+          <div class="prof-sep"></div>
+          <div class="pf-row"><span class="pf-lbl">Full Name</span><input class="pf-inp" id="pf-name" placeholder="Your name"/></div>
+          <div class="pf-row"><span class="pf-lbl">Email</span><input class="pf-inp" id="pf-email" type="email" placeholder="Email"/></div>
+          <div class="pf-row"><span class="pf-lbl">New Password</span><input class="pf-inp" id="pf-pass" type="password" placeholder="Leave blank to keep"/></div>
+          <div style="margin-top:14px"><button class="btn-run" onclick="saveProfile()">💾 Save Changes</button></div>
+        </div>
+        <div class="profile-card">
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Account Stats</div>
+          <div class="pf-row"><span class="pf-lbl">Member since</span><span class="pf-val">2025</span></div>
+          <div class="pf-row"><span class="pf-lbl">Total chats</span><span class="pf-val" id="prof-chats">0</span></div>
+          <div class="pf-row"><span class="pf-lbl">Active models</span><span class="pf-val" id="prof-models">4</span></div>
+          <div class="pf-row"><span class="pf-lbl">Account type</span><span class="pf-val" id="prof-type" style="color:var(--accent);font-weight:600">User</span></div>
+          <div class="pf-row"><span class="pf-lbl">Version</span><span class="pf-val" style="color:var(--deepseek);font-weight:600">V6.0.0</span></div>
+          <div class="pf-row"><span class="pf-lbl">API calls</span><span class="pf-val" id="prof-calls">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="panel" id="panel-settings">
+      <div style="font-size:15px;font-weight:600;color:var(--text)">Settings</div>
+      <div class="settings-grid">
+        <div class="setting-card">
+          <div class="setting-title">Appearance</div>
+          <div class="setting-sub">Theme and display preferences</div>
+          <div class="toggle-row"><span class="toggle-lbl">Dark mode</span><button class="tog on" id="tog-dark" onclick="togSetting('tog-dark',toggleTheme)"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Animations</span><button class="tog on" id="tog-anim" onclick="togSetting('tog-anim')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Glassmorphism</span><button class="tog on" id="tog-glass" onclick="togSetting('tog-glass')"></button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-title">AI Models</div>
+          <div class="setting-sub">Default active models</div>
+          <div class="toggle-row"><span class="toggle-lbl">Claude</span><button class="tog on" id="s-claude" onclick="togSetting('s-claude')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">ChatGPT</span><button class="tog on" id="s-openai" onclick="togSetting('s-openai')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Gemini</span><button class="tog on" id="s-gemini" onclick="togSetting('s-gemini')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">DeepSeek</span><button class="tog on" id="s-deepseek" onclick="togSetting('s-deepseek')"></button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-title">Chat</div>
+          <div class="setting-sub">Conversation preferences</div>
+          <div class="toggle-row"><span class="toggle-lbl">Auto-save history</span><button class="tog on"  id="tog-hist" onclick="togSetting('tog-hist')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Typing indicators</span><button class="tog on"  id="tog-type" onclick="togSetting('tog-type')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Timestamps</span><button class="tog on"  id="tog-time" onclick="togSetting('tog-time')"></button></div>
+        </div>
+        <div class="setting-card">
+          <div class="setting-title">Data &amp; Privacy</div>
+          <div class="setting-sub">Manage your data</div>
+          <div class="toggle-row"><span class="toggle-lbl">Save history</span><button class="tog on"  id="tog-save"      onclick="togSetting('tog-save')"></button></div>
+          <div class="toggle-row"><span class="toggle-lbl">Analytics</span><button class="tog off" id="tog-analytics" onclick="togSetting('tog-analytics')"></button></div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button class="btn-run danger" style="padding:7px 14px;font-size:11px" onclick="clearHistory();showToast('History cleared!')">Clear History</button>
+            <button class="btn-run" style="padding:7px 14px;font-size:11px;background:var(--glass);color:var(--text2);border:1px solid var(--border)" onclick="showToast('Data exported!')">Export Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main-area -->
+</div><!-- /app-layout -->
+
+<script>
+/* ════════════════════════════════════════
+   CONFIG + INIT
+════════════════════════════════════════ */
+const API   = 'http://localhost:8000';
+const token = localStorage.getItem('nexus_token');
+if (!token) window.location.href = 'index.html';
+
+const user = JSON.parse(localStorage.getItem('nexus_user') || '{}');
+document.getElementById('user-avatar').textContent      = user.avatar || 'U';
+document.getElementById('user-name').textContent        = user.name   || 'User';
+document.getElementById('user-email').textContent       = user.email  || '';
+document.getElementById('welcome-name').textContent     = (user.name  || 'User').split(' ')[0];
+document.getElementById('prof-av').textContent          = user.avatar || 'U';
+document.getElementById('prof-name').textContent        = user.name   || 'User';
+document.getElementById('prof-email-disp').textContent  = user.email  || '';
+if (document.getElementById('pf-name'))  document.getElementById('pf-name').value  = user.name  || '';
+if (document.getElementById('pf-email')) document.getElementById('pf-email').value = user.email || '';
+
+let apiCalls = 0;
+let selectedAgent = null;
+let dark = true;
+
+/* ── Model state ── */
+const models = {
+  claude:   { on:true, name:'Claude',   sub:'Anthropic', color:'#f97316', emoji:'🟠' },
+  openai:   { on:true, name:'ChatGPT',  sub:'GPT-4o',    color:'#10b981', emoji:'🟢' },
+  gemini:   { on:true, name:'Gemini',   sub:'Google',    color:'#3b82f6', emoji:'🔵' },
+  deepseek: { on:true, name:'DeepSeek', sub:'V3',        color:'#a855f7', emoji:'🟣' },
+};
+const chatHistories = { claude:[], openai:[], gemini:[], deepseek:[] };
+
+/* ── Language ── */
+function setLang(l) {
+  document.getElementById('lb-en').classList.toggle('active', l==='en');
+  document.getElementById('lb-hi').classList.toggle('active', l==='hi');
+  document.getElementById('chat-input').placeholder =
+    l==='en' ? 'Ask all 4 AI models simultaneously…' : 'सभी 4 AI से एक साथ पूछें…';
+  showToast(l==='en' ? 'Language: English' : 'भाषा: हिंदी');
+}
+
+/* ── Theme ── */
+function toggleTheme() {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? '' : 'light');
+  document.getElementById('theme-btn').textContent = dark ? '☀️' : '🌙';
+  const t = document.getElementById('tog-dark');
+  if (t) t.className = 'tog ' + (dark ? 'on' : 'off');
+}
+
+/* ── Toast ── */
+function showToast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'show' + (type==='err' ? ' err' : '');
+  setTimeout(() => { el.className = ''; }, 2500);
+}
+
+/* ── Admin check ── */
+async function checkAdminAccess() {
+  try {
+    const res  = await fetch(`${API}/api/me`, { headers: authHdr() });
+    const data = await res.json();
+    const isAdmin = data.is_admin || false;
+    document.getElementById('nav-admin').style.display      = isAdmin ? 'flex' : 'none';
+    document.getElementById('dash-admin-stats').style.display = isAdmin ? 'grid' : 'none';
+    document.getElementById('admin-badge').style.display    = isAdmin ? 'inline-block' : 'none';
+    const pt = document.getElementById('prof-type');
+    if (pt) { pt.textContent = isAdmin ? 'Admin' : 'User'; pt.style.color = isAdmin ? 'var(--deepseek)' : 'var(--accent)'; }
+  } catch {}
+}
+checkAdminAccess();
+
+/* ── Panel navigation ── */
+const TITLES = {
+  dashboard:'Dashboard', chat:'AI Chat · 4 Models', image:'Image Generator',
+  code:'Code Assistant', music:'Music Studio', voice:'Voice Lab', video:'Video Director',
+  translate:'Translate', pdf:'PDF Analyzer', seo:'SEO Writer',
+  resume:'Resume Builder', agents:'AI Agents',
+  history:'History', profile:'Profile', settings:'Settings',
+};
+function showPanel(id) {
+  document.querySelectorAll('.panel,.chat-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  const nav = document.getElementById('nav-' + id); if (nav) nav.classList.add('active');
+  document.getElementById('topbar-title').textContent = TITLES[id] || id;
+  if (id === 'chat')    buildChatCols();
+  if (id === 'history') loadHistory();
+  if (id === 'profile') loadProfile();
+}
+
+/* ── Helpers ── */
+function authHdr() { return { 'Content-Type':'application/json', 'Authorization':'Bearer '+token }; }
+function chipSel(el,g) { document.querySelectorAll('#'+g+' .chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+function getChip(g) { const c=document.querySelector('#'+g+' .chip.on'); return c?c.textContent.trim():''; }
+function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+function chatKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendToAll();} }
+function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function logout() { localStorage.clear(); window.location.href='index.html'; }
+function swapLangs() { const f=document.getElementById('lang-from'),t=document.getElementById('lang-to'); const tmp=f.value; f.value=t.value; t.value=tmp; }
+function togSetting(id,cb) { const el=document.getElementById(id); if(!el)return; el.className='tog '+(el.classList.contains('on')?'off':'on'); if(cb)cb(); showToast('Setting updated'); }
+function bumpCalls() { apiCalls++; document.getElementById('prof-calls').textContent=apiCalls; document.getElementById('prof-chats').textContent=apiCalls; }
+function renderMd(raw) {
+  let h=esc(raw);
+  h=h.replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre style="background:var(--glass);border:1px solid var(--border);border-radius:7px;padding:10px;overflow-x:auto;margin:6px 0"><code style="font-family:monospace;font-size:11px;color:var(--accent)">$1</code></pre>');
+  h=h.replace(/`([^`]+)`/g,'<code style="color:var(--accent);background:var(--accent-light);padding:1px 4px;border-radius:3px;font-size:11px">$1</code>');
+  h=h.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  h=h.replace(/^#{1,3} (.+)$/gm,'<div style="font-size:13px;font-weight:600;color:var(--text);margin:10px 0 3px">$1</div>');
+  h=h.replace(/\n/g,'<br>');
+  return h;
+}
+
+/* ════════════════════════════════════════
+   MODEL TOGGLES
+════════════════════════════════════════ */
+function toggleModel(m) {
+  models[m].on = !models[m].on;
+  document.getElementById('tog-'+m).className = 'tog-switch '+(models[m].on?'on':'off');
+  document.getElementById('mt-'+m).classList.toggle('active', models[m].on);
+  const active = Object.values(models).filter(x=>x.on).length;
+  document.getElementById('active-count').textContent = active+' model'+(active!==1?'s':'');
+  document.getElementById('prof-models').textContent  = active;
+  buildChatCols();
+  showToast((models[m].on?'✓ ':'✗ ')+models[m].name+(models[m].on?' enabled':' disabled'));
+}
+
+/* ════════════════════════════════════════
+   BUILD CHAT COLUMNS
+════════════════════════════════════════ */
+function buildChatCols() {
+  const active = Object.entries(models).filter(([,v])=>v.on);
+  const cols = document.getElementById('chat-cols');
+  const bar  = document.getElementById('model-chips-bar');
+  cols.className = 'chat-columns cols-'+Math.max(active.length,1);
+  bar.innerHTML  = active.map(([k,v])=>`
+    <div class="model-chip active">
+      <div class="dot" style="background:${v.color}"></div>
+      ${v.emoji} ${v.name} · ${v.sub}
+    </div>`).join('');
+  cols.innerHTML = active.map(([k,v])=>`
+    <div class="model-col" id="col-${k}">
+      <div class="col-header">
+        <div class="col-status online" id="status-${k}"></div>
+        <div><div class="col-model-name">${v.emoji} ${v.name}</div></div>
+        <div class="col-model-sub">${v.sub}</div>
+      </div>
+      <div class="col-msgs" id="msgs-${k}">
+        <div class="msg ai">
+          <div class="msg-avatar" style="background:${v.color}20;color:${v.color}">${v.name[0]}</div>
+          <div><div class="msg-bubble">Hi! I'm ${v.name}. Ask me anything!</div><div class="msg-time">Just now</div></div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+buildChatCols();
+
+/* ════════════════════════════════════════
+   SEND TO ALL MODELS SIMULTANEOUSLY
+════════════════════════════════════════ */
+async function sendToAll() {
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim(); if (!txt) return;
+  inp.value = ''; autoResize(inp);
+  document.getElementById('chat-send').disabled = true;
+  const active = Object.entries(models).filter(([,v])=>v.on);
+  if (!active.length) { showToast('Enable at least 1 model!','err'); document.getElementById('chat-send').disabled=false; return; }
+  active.forEach(([k,v]) => {
+    addUserMsg(k,txt);
+    chatHistories[k].push({role:'user',content:txt});
+    addTypingIndicator(k,v);
+    const st=document.getElementById('status-'+k);
+    if(st)st.className='col-status typing';
+  });
+  await Promise.allSettled(active.map(([k,v])=>callModel(k,v,txt)));
+  document.getElementById('chat-send').disabled = false;
+}
+
+function addUserMsg(modelKey,txt) {
+  const box=document.getElementById('msgs-'+modelKey); if(!box)return;
+  const w=document.createElement('div'); w.className='msg user';
+  const av=document.createElement('div'); av.className='msg-avatar'; av.textContent=user.avatar||'U';
+  const b=document.createElement('div');
+  const bub=document.createElement('div'); bub.className='msg-bubble'; bub.textContent=txt;
+  const t=document.createElement('div'); t.className='msg-time'; t.textContent=now();
+  b.appendChild(bub); b.appendChild(t); w.appendChild(av); w.appendChild(b);
+  box.appendChild(w); box.scrollTop=box.scrollHeight;
+}
+function addTypingIndicator(modelKey,v) {
+  const box=document.getElementById('msgs-'+modelKey); if(!box)return;
+  const w=document.createElement('div'); w.className='typing-row'; w.id='typing-'+modelKey;
+  const av=document.createElement('div'); av.className='msg-avatar'; av.style.background=v.color+'20'; av.style.color=v.color; av.textContent=v.name[0];
+  const bub=document.createElement('div'); bub.className='typing-bub'; bub.innerHTML='<span></span><span></span><span></span>';
+  w.appendChild(av); w.appendChild(bub); box.appendChild(w); box.scrollTop=box.scrollHeight;
+}
+function removeTyping(modelKey) {
+  document.getElementById('typing-'+modelKey)?.remove();
+  const st=document.getElementById('status-'+modelKey);
+  if(st)st.className='col-status online';
+}
+function addAiMsg(modelKey,v,text) {
+  const box=document.getElementById('msgs-'+modelKey); if(!box)return;
+  const w=document.createElement('div'); w.className='msg ai';
+  const av=document.createElement('div'); av.className='msg-avatar'; av.style.background=v.color+'20'; av.style.color=v.color; av.textContent=v.name[0];
+  const b=document.createElement('div');
+  const bub=document.createElement('div'); bub.className='msg-bubble'; bub.innerHTML=renderMd(text);
+  const t=document.createElement('div'); t.className='msg-time'; t.textContent=now();
+  b.appendChild(bub); b.appendChild(t); w.appendChild(av); w.appendChild(b);
+  box.appendChild(w); box.scrollTop=box.scrollHeight;
+}
+async function callModel(modelKey,v,prompt) {
+  try {
+    const res=await fetch(`${API}/api/claude`,{method:'POST',headers:authHdr(),
+      body:JSON.stringify({messages:chatHistories[modelKey],system:`You are ${v.name}, a helpful AI assistant inside Nexus AI V6. Be concise and clear.`,tool:'chat',model_preference:modelKey})});
+    const data=await res.json(); removeTyping(modelKey);
+    const reply=data.reply||data.detail||'[No response]';
+    chatHistories[modelKey].push({role:'assistant',content:reply});
+    addAiMsg(modelKey,v,reply); bumpCalls();
+  }catch{ removeTyping(modelKey); addAiMsg(modelKey,v,'[Cannot reach backend. Run: python main.py]'); }
+}
+
+/* ════════════════════════════════════════
+   TOOL RUNNER
+════════════════════════════════════════ */
+const TOOLS = {
+  image:    {sys:'You are an expert AI image prompt engineer. Generate: visual description, mood, lighting, color palette, composition, ready-to-copy prompt.',p:(t,c)=>`Style: ${c}\n\n"${t}"`},
+  code:     {sys:'You are an expert software engineer. Write clean, well-commented code with markdown code blocks.',p:(t,c)=>`Language: ${c}\n\n${t}`},
+  music:    {sys:'You are a creative music producer. Generate: title, BPM, key, chord progression, structure, sample lyrics, production notes.',p:(t,c)=>`Genre: ${c}\n\n"${t}"`},
+  voice:    {sys:'You are a professional voice-over scriptwriter. Write scripts with stage directions and tone notes.',p:(t,c)=>`Type: ${c}\n\n"${t}"`},
+  video:    {sys:'You are a professional video director. Create: scene breakdown, shot list, dialogue, B-roll notes, music cues.',p:(t,c)=>`Format: ${c}\n\n"${t}"`},
+  translate:{sys:'You are an expert translator. Translate accurately preserving tone. Show original and translation clearly.',p:(t,c)=>{const f=document.getElementById('lang-from').value;const to=document.getElementById('lang-to').value;return`From ${f} to ${to}. Tone: ${c}.\n\n"${t}"`;}},
+  pdf:      {sys:'You are an expert document analyst. Analyze thoroughly with structured findings.',p:(t,c)=>`Analysis: ${c}\n\n${t}`},
+  seo:      {sys:'You are an expert SEO content writer. Create optimized engaging content.',p:(t,c)=>`Type: ${c}\n\n${t}`},
+  resume:   {sys:'You are a professional resume writer. Create compelling ATS-friendly content.',p:(t,c)=>`Section: ${c}\n\n${t}`},
+};
+const LABELS={image:'✦ Generate Concept',code:'✦ Run AI',music:'✦ Create Track',voice:'✦ Generate Script',video:'✦ Direct Video',translate:'🌐 Translate',pdf:'📄 Analyze',seo:'📈 Generate SEO',resume:'📋 Build Resume'};
+
+async function runTool(id) {
+  const C=TOOLS[id];
+  const txt=document.getElementById(id+'-input').value.trim(); if(!txt)return;
+  const btn=document.getElementById(id+'-btn');
+  const out=document.getElementById(id+'-output');
+  btn.disabled=true; btn.textContent='Generating…';
+  out.innerHTML='<div class="output-placeholder"><div style="display:flex;gap:4px;justify-content:center"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.2s infinite .0s inline-block"></span><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.2s infinite .2s;display:inline-block"></span><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.2s infinite .4s;display:inline-block"></span></div><br>AI is thinking…</div>';
+  try {
+    const res=await fetch(`${API}/api/claude`,{method:'POST',headers:authHdr(),body:JSON.stringify({messages:[{role:'user',content:C.p(txt,getChip(id+'-chips'))}],system:C.sys,tool:id})});
+    const d=await res.json();
+    if(!res.ok){out.innerHTML=`<div class="output-placeholder">Error: ${esc(d.detail||'Something went wrong')}</div>`;return;}
+    out.innerHTML='<div class="output-content">'+renderMd(d.reply)+'</div>';
+    bumpCalls();
+  }catch{out.innerHTML='<div class="output-placeholder">[Cannot reach backend on port 8000]</div>';}
+  btn.disabled=false; btn.textContent=LABELS[id];
+}
+
+/* ════════════════════════════════════════
+   AI AGENTS
+════════════════════════════════════════ */
+const AGENT_SYS={
+  researcher:'You are an autonomous research agent. Produce a detailed structured report: Executive Summary, Key Findings, Background, Analysis, Data Points, Conclusion, Further Reading.',
+  writer:'You are an autonomous content writing agent. Produce a complete long-form piece with outline, introduction, all sections, conclusion, meta description.',
+  analyst:'You are an autonomous data analysis agent. Produce: Summary Statistics, Key Patterns, Insights, Recommendations, Conclusion.',
+  debugger:'You are an autonomous debugging agent. Identify all issues, explain root causes, provide fixed code with explanations.',
+  marketer:'You are an autonomous marketing agent. Create full campaign: audience, messaging, ad copy (3 variants), email subjects, social posts, campaign brief.',
+  planner:'You are an autonomous project planning agent. Produce: Goals, Phases, Tasks, Timeline, Dependencies, Risk assessment, Success metrics.',
+};
+function selectAgent(type,name) {
+  selectedAgent=type;
+  document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('ag-'+type).classList.add('selected');
+  document.getElementById('agent-selected-title').textContent=name+' — describe your task';
+  document.getElementById('agent-btn').disabled=false;
+  document.getElementById('agent-input').focus();
+  showToast(name+' selected');
+}
+async function runAgent() {
+  if(!selectedAgent)return;
+  const txt=document.getElementById('agent-input').value.trim(); if(!txt)return;
+  const btn=document.getElementById('agent-btn');
+  const out=document.getElementById('agent-output');
+  btn.disabled=true; btn.textContent='🤖 Running…';
+  out.innerHTML='<div class="output-placeholder">Agent is working…</div>';
+  try {
+    const res=await fetch(`${API}/api/claude`,{method:'POST',headers:authHdr(),body:JSON.stringify({messages:[{role:'user',content:txt}],system:AGENT_SYS[selectedAgent],tool:'agents'})});
+    const d=await res.json();
+    out.innerHTML='<div class="output-content">'+renderMd(d.reply||d.detail)+'</div>';
+    bumpCalls();
+  }catch{out.innerHTML='<div class="output-placeholder">[Cannot reach backend]</div>';}
+  btn.disabled=false; btn.textContent='🤖 Run Agent';
+}
+
+/* ════════════════════════════════════════
+   HISTORY
+════════════════════════════════════════ */
+async function loadHistory() {
+  const el=document.getElementById('history-list');
+  el.innerHTML='<div class="output-placeholder">Loading from MongoDB…</div>';
+  try {
+    const res=await fetch(`${API}/api/history`,{headers:authHdr()});
+    const data=await res.json();
+    if(!data.history?.length){el.innerHTML='<div class="output-placeholder">No history yet. Start using a tool!</div>';return;}
+    el.innerHTML=data.history.map(h=>`
+      <div class="history-item">
+        <div class="history-meta">
+          <span class="h-tool">${esc(h.tool.toUpperCase())}</span>
+          ${h.model?`<span class="h-model ${esc(h.model)}">${esc(h.model)}</span>`:''}
+          <span class="h-time">${new Date(h.created_at).toLocaleString()}</span>
+        </div>
+        <div class="h-prompt">${esc(h.prompt)}</div>
+        <div class="h-resp">${esc(h.response)}</div>
+      </div>`).join('');
+  }catch{el.innerHTML='<div class="output-placeholder">Cannot load history. Is backend running?</div>';}
+}
+async function clearHistory() {
+  if(!confirm('Clear all history from MongoDB?'))return;
+  try{await fetch(`${API}/api/history`,{method:'DELETE',headers:authHdr()});loadHistory();showToast('History cleared from MongoDB!');}
+  catch{showToast('Failed to clear','err');}
+}
+
+/* ════════════════════════════════════════
+   PROFILE
+════════════════════════════════════════ */
+async function loadProfile() {
+  try {
+    const res=await fetch(`${API}/api/me`,{headers:authHdr()});
+    const data=await res.json();
+    document.getElementById('prof-av').textContent         = data.avatar||data.name[0].toUpperCase();
+    document.getElementById('prof-name').textContent       = data.name;
+    document.getElementById('prof-email-disp').textContent = data.email;
+    document.getElementById('pf-name').value  = data.name;
+    document.getElementById('pf-email').value = data.email;
+    const pt=document.getElementById('prof-type');
+    if(pt){pt.textContent=data.is_admin?'Admin':'User';pt.style.color=data.is_admin?'var(--deepseek)':'var(--accent)';}
+  }catch{}
+}
+async function saveProfile() {
+  const name=document.getElementById('pf-name').value.trim();
+  const pass=document.getElementById('pf-pass').value;
+  const body={};
+  if(name)body.name=name;
+  if(pass&&pass.length>=6)body.password=pass;
+  if(!Object.keys(body).length)return showToast('Nothing to update','err');
+  try{
+    const res=await fetch(`${API}/api/profile`,{method:'PATCH',headers:authHdr(),body:JSON.stringify(body)});
+    if(!res.ok){showToast('Update failed','err');return;}
+    if(name){document.getElementById('prof-av').textContent=name[0].toUpperCase();document.getElementById('prof-name').textContent=name;document.getElementById('user-name').textContent=name;}
+    document.getElementById('pf-pass').value='';
+    showToast('Profile saved to MongoDB!');
+  }catch{showToast('Cannot reach backend','err');}
+}
+</script>
+</body>
+</html>

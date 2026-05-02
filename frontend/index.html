@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nexus AI V6 — Sign In</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth-page">
+<div id="toast"></div>
+
+<div class="auth-wrap">
+  <div class="auth-logo">
+    <div class="auth-logo-icon">⬡</div>
+    <h1>Nexus AI <span style="font-size:14px;opacity:.6;font-weight:400">V6</span></h1>
+    <p>4 AI Models · 14 Tools · MongoDB Powered</p>
+  </div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" onclick="switchTab('register')">Sign Up</button>
+    </div>
+    <div id="error-msg" class="error-msg"></div>
+
+    <!-- Login -->
+    <div id="form-login">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    </div>
+
+    <!-- Register -->
+    <div id="form-register" style="display:none">
+      <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your name"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doRegister()"/></div>
+      <button class="btn-primary" id="reg-btn" onclick="doRegister()">Create Account</button>
+      <p class="terms">By signing up you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text3)">
+    Admin? <a href="admin.html" style="color:var(--accent);text-decoration:none">Go to Admin Panel →</a>
+  </p>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+if (localStorage.getItem('nexus_token')) window.location.href = 'app.html';
+
+function showToast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='show'+(type==='err'?' err':'');setTimeout(()=>{el.className=''},2500)}
+function switchTab(t){
+  document.getElementById('tab-login').classList.toggle('active',t==='login');
+  document.getElementById('tab-register').classList.toggle('active',t==='register');
+  document.getElementById('form-login').style.display    = t==='login'    ?'block':'none';
+  document.getElementById('form-register').style.display = t==='register' ?'block':'none';
+  hideErr();
+}
+function showErr(m){const e=document.getElementById('error-msg');e.textContent=m;e.style.display='block'}
+function hideErr(){document.getElementById('error-msg').style.display='none'}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  if(!email||!password)return showErr('Please fill in all fields.');
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.textContent='Signing in…';hideErr();
+  try{
+    const res=await fetch(`${API}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const d=await res.json();
+    if(!res.ok)return showErr(d.detail||'Login failed.');
+    localStorage.setItem('nexus_token',d.token);
+    localStorage.setItem('nexus_user',JSON.stringify(d.user));
+    window.location.href='app.html';
+  }catch{showErr('Cannot connect to server. Make sure backend is running on port 8000.');}
+  finally{btn.disabled=false;btn.textContent='Sign In';}
+}
+
+async function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const password=document.getElementById('reg-password').value;
+  if(!name||!email||!password)return showErr('Please fill in all fields.');
+  if(password.length<6)return showErr('Password must be at least 6 characters.');
+  const btn=document.getElementById('reg-btn');
+  btn.disabled=true;btn.textContent='Creating account…';hideErr();
+  try{
+    const res=await fetch(`${API}/api/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+    const d=await res.json();
+    if(!res.ok)return showErr(d.detail||'Registration failed.');
+    localStorage.setItem('nexus_token',d.token);
+    localStorage.setItem('nexus_user',JSON.stringify(d.user));
+    window.location.href='app.html';
+  }catch{showErr('Cannot connect to server. Make sure backend is running on port 8000.');}
+  finally{btn.disabled=false;btn.textContent='Create Account';}
+}
+</script>
+</body>
+</html>

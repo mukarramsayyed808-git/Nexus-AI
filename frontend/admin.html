@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nexus AI V6 — Admin</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen" class="auth-page">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <div class="auth-logo-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">⬡</div>
+      <h1>Nexus Admin <span style="font-size:13px;opacity:.5;font-weight:400">V6</span></h1>
+      <p>Restricted — administrators only</p>
+    </div>
+    <div class="auth-card">
+      <div id="login-error" class="error-msg"></div>
+      <div class="form-group"><label>Username</label><input type="text" id="admin-user" placeholder="admin" autocomplete="username"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="admin-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
+      <button class="btn-primary" style="background:linear-gradient(135deg,#7c3aed,#a855f7)" id="login-btn" onclick="doAdminLogin()">Sign In as Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ── -->
+<div id="admin-app" style="display:none">
+<div id="app-layout">
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">⬡</div>
+        <div><div class="logo-name">Nexus Admin<span class="logo-ver">V6</span></div><div class="logo-sub">Control Panel</div></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="section-label">Admin</div>
+      <button class="nav-item active" id="nav-overview" onclick="showAdmin('overview')"><span class="nav-icon">📊</span>Overview</button>
+      <button class="nav-item" id="nav-users"   onclick="showAdmin('users')"><span class="nav-icon">👥</span>Users</button>
+      <button class="nav-item" id="nav-history" onclick="showAdmin('history')"><span class="nav-icon">📜</span>All History</button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7)" id="admin-av">A</div>
+        <div><div class="user-name" id="admin-nm">Admin</div><div class="user-email">Super Admin · V6</div></div>
+        <button class="logout-btn" onclick="doLogout()" title="Sign out">⏻</button>
+      </div>
+    </div>
+  </nav>
+
+  <div id="main-area">
+    <div id="topbar">
+      <span class="topbar-title" id="admin-page-title">Overview</span>
+      <div class="topbar-right">
+        <span class="admin-badge badge-admin">⬡ V6 Admin</span>
+        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">☀️</button>
+      </div>
+    </div>
+    <div id="content">
+
+      <!-- OVERVIEW -->
+      <div class="panel active" id="panel-overview">
+        <div class="stat-grid">
+          <div class="stat-card-admin blue"><div class="sca-label">Total Users</div><div class="sca-val" id="s-users">—</div><div class="sca-sub" id="s-new">Loading…</div></div>
+          <div class="stat-card-admin green"><div class="sca-label">Active Users</div><div class="sca-val" id="s-active">—</div><div class="sca-sub">Not banned</div></div>
+          <div class="stat-card-admin purple"><div class="sca-label">Total Chats</div><div class="sca-val" id="s-chats">—</div><div class="sca-sub">All 4 models</div></div>
+          <div class="stat-card-admin red"><div class="sca-label">Banned Users</div><div class="sca-val" id="s-banned">—</div><div class="sca-sub">Suspended</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+          <div class="section-card">
+            <div class="section-hdr"><div><div class="section-hdr-title">Chats by tool</div><div class="section-hdr-sub">Usage breakdown</div></div></div>
+            <div class="tool-bar-wrap" id="tool-bars"><div class="empty-state">Loading…</div></div>
+          </div>
+          <div class="section-card">
+            <div class="section-hdr"><div><div class="section-hdr-title">Chats by model</div><div class="section-hdr-sub">Claude·GPT·Gemini·DeepSeek</div></div></div>
+            <div class="tool-bar-wrap" id="model-bars"><div class="empty-state">Loading…</div></div>
+          </div>
+          <div class="section-card">
+            <div class="section-hdr"><div><div class="section-hdr-title">Top users</div><div class="section-hdr-sub">By chat count</div></div></div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Email</th><th>Chats</th></tr></thead>
+              <tbody id="top-users-tbl"><tr><td colspan="2" class="empty-state">Loading…</td></tr></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="panel" id="panel-users">
+        <div class="section-card" style="flex:1">
+          <div class="section-hdr">
+            <div><div class="section-hdr-title">All Users</div><div class="section-hdr-sub" id="u-count">Loading…</div></div>
+            <button class="btn-run" style="padding:8px 14px;font-size:12px" onclick="loadUsers()">↻ Refresh</button>
+          </div>
+          <div class="filter-row"><input class="filter-input" id="u-search" placeholder="Search by name or email…" oninput="filterU()" style="width:280px"/></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Email</th><th>Chats</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="u-tbl"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="panel" id="panel-history">
+        <div class="section-card" style="flex:1">
+          <div class="section-hdr">
+            <div><div class="section-hdr-title">All Chat History</div><div class="section-hdr-sub">Latest 100 entries · all users · all models</div></div>
+            <button class="btn-run" style="padding:8px 14px;font-size:12px" onclick="loadAllHistory()">↻ Refresh</button>
+          </div>
+          <div class="filter-row">
+            <input class="filter-input" id="h-email" placeholder="Filter by email…" oninput="loadAllHistory()" style="width:180px"/>
+            <select class="filter-input" id="h-tool" onchange="loadAllHistory()">
+              <option value="">All tools</option>
+              <option>chat</option><option>image</option><option>code</option><option>music</option>
+              <option>voice</option><option>video</option><option>translate</option><option>pdf</option>
+              <option>seo</option><option>resume</option><option>agents</option>
+            </select>
+            <select class="filter-input" id="h-model" onchange="loadAllHistory()">
+              <option value="">All models</option>
+              <option>claude</option><option>openai</option><option>gemini</option><option>deepseek</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Tool</th><th>Model</th><th style="width:25%">Prompt</th><th style="width:25%">Response</th><th>Date</th></tr></thead>
+              <tbody id="h-tbl"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const API = 'http://localhost:8000';
+let adminToken = localStorage.getItem('nexus_admin_token');
+let allUsers   = [];
+let dark       = true;
+
+function showToast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='show'+(type==='err'?' err':'');setTimeout(()=>{el.className=''},3000)}
+function toggleTheme(){dark=!dark;document.documentElement.setAttribute('data-theme',dark?'':'light');document.getElementById('theme-btn').textContent=dark?'☀️':'🌙';}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+function fmtDate(iso){try{return new Date(iso).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}catch{return iso||''}}
+function trunc(s,n=50){return s&&s.length>n?s.substring(0,n)+'…':s||''}
+
+if(adminToken){showApp();loadOverview();}else showLogin();
+
+function showLogin(){document.getElementById('login-screen').style.display='flex';document.getElementById('admin-app').style.display='none'}
+function showApp(){document.getElementById('login-screen').style.display='none';document.getElementById('admin-app').style.display='block'}
+
+async function doAdminLogin(){
+  const username=document.getElementById('admin-user').value.trim();
+  const password=document.getElementById('admin-pass').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  if(!username||!password){errEl.textContent='Fill in all fields.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Signing in…';errEl.style.display='none';
+  try{
+    const res=await fetch(`${API}/api/admin/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    const d=await res.json();
+    if(!res.ok){errEl.textContent=d.detail||'Login failed.';errEl.style.display='block';return;}
+    adminToken=d.token;localStorage.setItem('nexus_admin_token',adminToken);
+    document.getElementById('admin-nm').textContent=d.admin.name;
+    document.getElementById('admin-av').textContent=d.admin.name[0].toUpperCase();
+    showApp();loadOverview();
+  }catch{errEl.textContent='Cannot connect to server.';errEl.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Sign In as Admin';}
+}
+function doLogout(){localStorage.removeItem('nexus_admin_token');adminToken=null;showLogin();}
+function aHdr(){return{'Content-Type':'application/json','Authorization':'Bearer '+adminToken}}
+
+const PTITLES={overview:'Overview',users:'Users',history:'All History'};
+function showAdmin(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  document.getElementById('admin-page-title').textContent=PTITLES[id]||id;
+  if(id==='users')   loadUsers();
+  if(id==='history') loadAllHistory();
+}
+
+/* Overview */
+async function loadOverview(){
+  try{
+    const res=await fetch(`${API}/api/admin/stats`,{headers:aHdr()});
+    if(res.status===401||res.status===403){doLogout();return;}
+    const d=await res.json();
+    document.getElementById('s-users').textContent  =d.total_users;
+    document.getElementById('s-active').textContent =d.active_users;
+    document.getElementById('s-chats').textContent  =d.total_chats;
+    document.getElementById('s-banned').textContent =d.banned_users;
+    document.getElementById('s-new').textContent    =`+${d.recent_signups} this week`;
+    const maxT=Math.max(...(d.tool_stats||[]).map(t=>t.count),1);
+    document.getElementById('tool-bars').innerHTML=(d.tool_stats||[]).length
+      ? d.tool_stats.map(t=>`<div class="tool-bar-row"><span class="tool-bar-label">${esc(t.tool)}</span><div class="tool-bar-track"><div class="tool-bar-fill" style="width:${Math.round(t.count/maxT*100)}%"></div></div><span class="tool-bar-count">${t.count}</span></div>`).join('')
+      : '<div class="empty-state">No data yet</div>';
+    const MODEL_COLORS={claude:'#f97316',openai:'#10b981',gemini:'#3b82f6',deepseek:'#a855f7'};
+    const maxM=Math.max(...(d.model_stats||[]).map(m=>m.count),1);
+    document.getElementById('model-bars').innerHTML=(d.model_stats||[]).length
+      ? d.model_stats.map(m=>`<div class="tool-bar-row"><span class="tool-bar-label">${esc(m.model||'?')}</span><div class="tool-bar-track"><div class="tool-bar-fill" style="width:${Math.round(m.count/maxM*100)}%;background:${MODEL_COLORS[m.model]||'var(--accent)'}"></div></div><span class="tool-bar-count">${m.count}</span></div>`).join('')
+      : '<div class="empty-state">No data yet</div>';
+    document.getElementById('top-users-tbl').innerHTML=(d.top_users||[]).length
+      ? d.top_users.map(u=>`<tr><td style="color:var(--text2);font-size:11px">${esc(u.email)}</td><td><strong>${u.chats}</strong></td></tr>`).join('')
+      : '<tr><td colspan="2" class="empty-state">No data yet</td></tr>';
+  }catch(e){showToast('Failed to load stats','err');}
+}
+
+/* Users */
+async function loadUsers(){
+  document.getElementById('u-tbl').innerHTML='<tr><td colspan="6" class="empty-state">Loading…</td></tr>';
+  try{
+    const res=await fetch(`${API}/api/admin/users`,{headers:aHdr()});
+    const d=await res.json();
+    allUsers=(d.users||[]).map(u=>({...u,av:u.avatar||u.name[0].toUpperCase()}));
+    document.getElementById('u-count').textContent=`${allUsers.length} total users`;
+    renderUsers(allUsers);
+  }catch{showToast('Failed to load users','err');}
+}
+function renderUsers(users){
+  const tb=document.getElementById('u-tbl');
+  if(!users.length){tb.innerHTML='<tr><td colspan="6" class="empty-state">No users found</td></tr>';return;}
+  tb.innerHTML=users.map(u=>`
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${esc(u.av)}</div>
+        <span style="font-weight:500">${esc(u.name)}</span></div></td>
+      <td style="color:var(--text2);font-size:12px">${esc(u.email)}</td>
+      <td><strong>${u.chat_count||0}</strong></td>
+      <td style="color:var(--text3);font-size:11px">${fmtDate(u.created_at)}</td>
+      <td><span class="admin-badge ${u.banned?'badge-banned':'badge-active'}">${u.banned?'Banned':'Active'}</span></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="action-btn ban" onclick="toggleBan('${u.id}','${esc(u.email)}',${u.banned})">${u.banned?'Unban':'Ban'}</button>
+        <button class="action-btn del" onclick="deleteUser('${u.id}','${esc(u.email)}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+function filterU(){const q=document.getElementById('u-search').value.toLowerCase();renderUsers(q?allUsers.filter(u=>u.name.toLowerCase().includes(q)||u.email.toLowerCase().includes(q)):allUsers);}
+async function toggleBan(id,email,banned){
+  if(!confirm(`${banned?'Unban':'Ban'} user ${email}?`))return;
+  try{
+    const res=await fetch(`${API}/api/admin/users/${id}/ban`,{method:'PATCH',headers:aHdr()});
+    const d=await res.json();
+    showToast(`${d.banned?'Banned':'Unbanned'}: ${email}`);
+    loadUsers();loadOverview();
+  }catch{showToast('Action failed','err');}
+}
+async function deleteUser(id,email){
+  if(!confirm(`Permanently delete ${email} and ALL their data?\n\nThis CANNOT be undone.`))return;
+  try{
+    const res=await fetch(`${API}/api/admin/users/${id}`,{method:'DELETE',headers:aHdr()});
+    if(!res.ok)throw new Error();
+    showToast(`Deleted: ${email}`);loadUsers();loadOverview();
+  }catch{showToast('Delete failed','err');}
+}
+
+/* History */
+const MODEL_COLORS={claude:'rgba(249,115,22,.1)',openai:'rgba(16,185,129,.1)',gemini:'rgba(59,130,246,.1)',deepseek:'rgba(168,85,247,.1)'};
+const MODEL_TEXT  ={claude:'#f97316',openai:'#10b981',gemini:'#3b82f6',deepseek:'#a855f7'};
+
+async function loadAllHistory(){
+  document.getElementById('h-tbl').innerHTML='<tr><td colspan="6" class="empty-state">Loading…</td></tr>';
+  try{
+    const email=document.getElementById('h-email').value.trim();
+    const tool =document.getElementById('h-tool').value;
+    const model=document.getElementById('h-model').value;
+    let url=`${API}/api/admin/history?`;
+    if(email)url+=`email=${encodeURIComponent(email)}&`;
+    if(tool) url+=`tool=${encodeURIComponent(tool)}&`;
+    if(model)url+=`model=${encodeURIComponent(model)}`;
+    const res=await fetch(url,{headers:aHdr()});
+    const d=await res.json();
+    const items=d.history||[];
+    if(!items.length){document.getElementById('h-tbl').innerHTML='<tr><td colspan="6" class="empty-state">No history found</td></tr>';return;}
+    document.getElementById('h-tbl').innerHTML=items.map(h=>`
+      <tr>
+        <td style="font-size:11px;color:var(--text2)">${esc(h.user_email)}</td>
+        <td><span class="admin-badge badge-tool">${esc(h.tool)}</span></td>
+        <td>${h.model?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:${MODEL_COLORS[h.model]||'var(--accent-light)'};color:${MODEL_TEXT[h.model]||'var(--accent)'}">${esc(h.model)}</span>`:''}</td>
+        <td style="font-size:11px">${esc(trunc(h.prompt))}</td>
+        <td style="font-size:11px;color:var(--text2)">${esc(trunc(h.response))}</td>
+        <td style="font-size:11px;color:var(--text3);white-space:nowrap">${fmtDate(h.created_at)}</td>
+      </tr>`).join('');
+  }catch{showToast('Failed to load history','err');}
+}
+</script>
+</body>
+</html>
